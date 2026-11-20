@@ -50,7 +50,7 @@ cp -r codebase-cleanup-review/skills/codebase-cleanup-review ~/.claude/skills/
 
 ### Claude.ai
 
-Download `codebase-cleanup-review.skill` from the [latest release](https://github.com/KevinLGoh/codebase-cleanup-review/releases), then upload it in **Settings > Capabilities > Skills**.
+Download `codebase-cleanup-review.zip` from the [latest release](https://github.com/KevinLGoh/codebase-cleanup-review/releases), then upload it in **Settings > Capabilities > Skills**. The release also includes the same skill as a `.skill` file.
 
 ## Usage
 
