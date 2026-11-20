@@ -1,0 +1,16 @@
+{
+  "name": "kevinlgoh",
+  "description": "Plugins by KevinLGoh",
+  "owner": {
+    "name": "KevinLGoh",
+    "url": "https://github.com/KevinLGoh"
+  },
+  "plugins": [
+    {
+      "name": "codebase-cleanup-review",
+      "source": "./",
+      "description": "Evidence-based cleanup review of a codebase. Reports first, applies changes only on approval.",
+      "version": "1.0.0"
+    }
+  ]
+}
