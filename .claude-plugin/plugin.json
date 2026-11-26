@@ -6,8 +6,8 @@
     "name": "KevinLGoh",
     "url": "https://github.com/KevinLGoh"
   },
-  "homepage": "https://github.com/KevinLGoh/codebase-cleanup-review",
-  "repository": "https://github.com/KevinLGoh/codebase-cleanup-review",
+  "homepage": "https://github.com/KevinLGoh/codebase-cleanup",
+  "repository": "https://github.com/KevinLGoh/codebase-cleanup",
   "license": "MIT",
   "keywords": ["dead-code", "refactoring", "tech-debt", "code-quality", "cleanup", "code-smells"]
 }

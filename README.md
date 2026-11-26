@@ -32,25 +32,27 @@ For every finding, the report explains **why it's unnecessary** (with evidence),
 
 ### Claude Code (plugin)
 
+This repository is private, so you need read access to it, and git on your machine must be able to authenticate to GitHub.
+
 ```bash
-claude plugin marketplace add KevinLGoh/codebase-cleanup-review
+claude plugin marketplace add KevinLGoh/codebase-cleanup
 claude plugin install codebase-cleanup-review@kevinlgoh
 ```
 
-Or inside a session: `/plugin marketplace add KevinLGoh/codebase-cleanup-review`, then `/plugin install codebase-cleanup-review@kevinlgoh`.
+Or inside a session: `/plugin marketplace add KevinLGoh/codebase-cleanup`, then `/plugin install codebase-cleanup-review@kevinlgoh`.
 
 ### Claude Code (standalone skill)
 
 Copy the skill folder into your personal skills directory:
 
 ```bash
-git clone https://github.com/KevinLGoh/codebase-cleanup-review.git
-cp -r codebase-cleanup-review/skills/codebase-cleanup-review ~/.claude/skills/
+git clone https://github.com/KevinLGoh/codebase-cleanup.git
+cp -r codebase-cleanup/skills/codebase-cleanup-review ~/.claude/skills/
 ```
 
 ### Claude.ai
 
-Download `codebase-cleanup-review.zip` from the [latest release](https://github.com/KevinLGoh/codebase-cleanup-review/releases), then upload it in **Settings > Capabilities > Skills**. The release also includes the same skill as a `.skill` file.
+Download `codebase-cleanup-review.zip` from the [latest release](https://github.com/KevinLGoh/codebase-cleanup/releases), then upload it in **Settings > Capabilities > Skills**. The release also includes the same skill as a `.skill` file.
 
 ## Usage
 
