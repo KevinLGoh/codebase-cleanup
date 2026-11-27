@@ -1,0 +1,36 @@
+{
+  "name": "codebase-cleanup-review",
+  "version": "1.1.0",
+  "description": "Evidence-based cleanup review of a codebase: dead code, duplicates, unused UI components, overengineering, legacy code, redundant queries and API calls, and abandoned files. Reports first, applies changes only on approval.",
+  "author": {
+    "name": "KevinLGoh",
+    "url": "https://github.com/KevinLGoh"
+  },
+  "homepage": "https://github.com/KevinLGoh/codebase-cleanup",
+  "repository": "https://github.com/KevinLGoh/codebase-cleanup",
+  "license": "MIT",
+  "keywords": [
+    "dead-code",
+    "refactoring",
+    "tech-debt",
+    "code-quality",
+    "cleanup",
+    "code-smells"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Codebase Cleanup Review",
+    "shortDescription": "Find code you can safely remove or simplify",
+    "longDescription": "Reviews a codebase for dead code, duplicate logic, unused UI components, overengineering, legacy code, redundant queries and abandoned files. It writes a report with evidence, risks and a phased cleanup plan, and only changes code you approve.",
+    "developerName": "KevinLGoh",
+    "category": "Productivity",
+    "websiteURL": "https://github.com/KevinLGoh/codebase-cleanup",
+    "defaultPrompt": [
+      "Run a cleanup review of this repository",
+      "Find dead code in src/ and tell me what is safe to delete"
+    ],
+    "brandColor": "#1C2434",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png"
+  }
+}

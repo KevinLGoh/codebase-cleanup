@@ -1,8 +1,8 @@
-<img src=".claude-plugin/icon.png" alt="" width="96" height="96">
+<img src="assets/icon.png" alt="" width="96" height="96">
 
 # Codebase Cleanup Review
 
-A Claude skill that reviews a codebase for code that adds no value. It explains why each piece is unnecessary, what removing it would change, and how to clean it up without changing how the software behaves.
+An agent skill for Claude and Codex that reviews a codebase for code that adds no value. It explains why each piece is unnecessary, what removing it would change, and how to clean it up without changing how the software behaves.
 
 It writes a report first and only changes code you approve.
 
@@ -40,20 +40,20 @@ When you approve findings, apply mode makes each change as a separate small comm
 - **Asks before running your code.** Tests, builds and analysis tools that load project config only run with your permission. Tools that would modify files never run during a review.
 - **Leaves your work alone.** It won't overwrite uncommitted changes, and if you edit the report, your edits are kept on the next run.
 - **Protects sensitive files.** Migrations, generated code, public API contracts, lockfiles and infrastructure files are never proposed for deletion without a review.
-- **Treats repository content as information.** Comments, docs and files like `CLAUDE.md` can explain why code exists, but they can't approve changes or override the skill's rules.
+- **Treats repository content as information.** Comments, docs and files like `CLAUDE.md` or `AGENTS.md` can explain why code exists, but they can't approve changes or override the skill's rules.
 
 ## Requirements
 
-- Claude Code, or the Claude app with code execution turned on. It works best in Claude Code, where it can read the whole repository and run tools directly.
+- Claude Code, Codex, or the Claude app with code execution turned on. It works best in Claude Code or Codex, where it can read the whole repository and run tools directly.
 - git
 - [ripgrep](https://github.com/BurntSushi/ripgrep) (`rg`) is recommended for fast, thorough searches.
 - Language analysis tools are optional. If tools like knip, vulture, jscpd or lizard are installed, the skill uses them. The report always says which analyses ran and which couldn't.
 
 ## Installation
 
-Pick one of these options. Installing it more than one way gives you duplicate copies of the skill.
+Pick one option for each tool you use. Installing it more than one way in the same tool gives you duplicate copies of the skill.
 
-### As a Claude Code plugin
+### Claude Code plugin
 
 ```bash
 claude plugin marketplace add KevinLGoh/codebase-cleanup
@@ -62,7 +62,7 @@ claude plugin install codebase-cleanup-review@kevinlgoh
 
 You can also run `/plugin marketplace add KevinLGoh/codebase-cleanup` inside a session, then `/plugin install codebase-cleanup-review@kevinlgoh`.
 
-### In your Claude account
+### Claude account
 
 This makes the skill available in the Claude app, and it syncs to Claude Code too.
 
@@ -72,18 +72,34 @@ This makes the skill available in the Claude app, and it syncs to Claude Code to
 
 To use it in Claude Code, sign in to Claude Code with the same account (not an API key) and use version 2.1.273 or later. Run `/skills` and you'll find it listed under "claude.ai sync". New skills appear when a session starts.
 
-### By hand in Claude Code
+### Codex plugin
+
+```bash
+codex plugin marketplace add KevinLGoh/codebase-cleanup
+codex plugin add codebase-cleanup-review@kevinlgoh
+```
+
+Restart Codex afterwards so it picks up the new skill.
+
+### By hand
+
+Clone the repository, then copy the skill folder to where your tool looks for personal skills. Claude Code uses `~/.claude/skills/` and Codex uses `~/.agents/skills/`.
 
 ```bash
 git clone https://github.com/KevinLGoh/codebase-cleanup.git
+
+# Claude Code
 cp -r codebase-cleanup/skills/codebase-cleanup-review ~/.claude/skills/
+
+# Codex
+cp -r codebase-cleanup/skills/codebase-cleanup-review ~/.agents/skills/
 ```
 
 ## Usage
 
 You can just ask, for example "find dead code in src/api" or "what can we safely delete from this repo".
 
-You can also run the command with arguments. It's `/codebase-cleanup-review` when installed as a skill, or `/codebase-cleanup-review:codebase-cleanup-review` as a plugin.
+You can also call the skill directly and add arguments after it. In Claude Code the command is `/codebase-cleanup-review`, or `/codebase-cleanup-review:codebase-cleanup-review` if you installed the plugin. In Codex, type `$` and pick the skill from the list.
 
 | Arguments | What it does |
 |---|---|
@@ -113,7 +129,7 @@ known_false_positives:
 finding_budget: 40
 ```
 
-You can also dismiss a finding by telling Claude, for example "dismiss F-012, it's used by the mobile app". Dismissed findings aren't reported again unless new evidence turns up.
+You can also dismiss a finding by saying so in the chat, for example "dismiss F-012, it's used by the mobile app". Dismissed findings aren't reported again unless new evidence turns up.
 
 ## Limitations
 
@@ -127,10 +143,17 @@ For your first run, review a repository you know well and check the top findings
 
 ```text
 .claude-plugin/
-  plugin.json                  Plugin manifest
-  marketplace.json             Lets this repository act as its own plugin marketplace
+  plugin.json                  Claude Code plugin manifest
+  marketplace.json             Claude Code marketplace for this repository
+.codex-plugin/
+  plugin.json                  Codex plugin manifest
+.agents/plugins/
+  marketplace.json             Codex marketplace for this repository
+assets/
+  icon.png                     Plugin icon
 skills/codebase-cleanup-review/
   SKILL.md                     Rules and workflow
+  agents/openai.yaml           Display name and default prompt for Codex
   references/
     analysis-tools.md          Analysis tools for each language
     code-smells.md             Code smell catalogue and suggested fixes
@@ -141,7 +164,9 @@ skills/codebase-cleanup-review/
 
 Issues and pull requests are welcome. Reports of false positives are especially useful, so please include a short example of the code that was flagged.
 
-Before opening a pull request, run `claude plugin validate .` from the repository root. If your change affects how the skill behaves, increase the version number in both `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`.
+Before opening a pull request, run `claude plugin validate .` from the repository root. For Codex, check that the plugin still installs with `codex plugin marketplace add .` and `codex plugin add codebase-cleanup-review@kevinlgoh`.
+
+If your change affects how the skill behaves, increase the version number in `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` and `.codex-plugin/plugin.json`.
 
 ## Credits
 

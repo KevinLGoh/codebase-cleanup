@@ -20,7 +20,7 @@ This file holds the rules and workflow. Read the reference files when you reach 
 
 ## Invocation
 
-Arguments follow the skill's command (`/codebase-cleanup-review` when installed as a skill, `/codebase-cleanup-review:codebase-cleanup-review` when installed as a plugin):
+Arguments follow the skill's name. In Claude Code that's `/codebase-cleanup-review`, or `/codebase-cleanup-review:codebase-cleanup-review` when installed as a plugin. In Codex, type `$` and pick the skill.
 
 ```text
 (no arguments)                  audit the whole repository
@@ -122,7 +122,7 @@ Tag findings with code smells where they fit (`references/code-smells.md`). Smel
 
 ### 4. Validate
 
-Try to **disprove** each candidate: rerun the false-positive checklist, search the whole repository including hidden files, read the commit that introduced the code, and check which tests cover it. On large repositories, use parallel subagents per category and a separate validator subagent whose only job is to disprove findings.
+Try to **disprove** each candidate: rerun the false-positive checklist, search the whole repository including hidden files, read the commit that introduced the code, and check which tests cover it. On large repositories, if your environment supports subagents, run categories in parallel and use a separate validator subagent whose only job is to disprove findings.
 
 For High or Critical risk, the risks field must also cover whichever apply: external API compatibility, persisted data (schemas, serialised formats, cache keys), side effects (events, emails, jobs, analytics), performance, and security checks that might disappear with a "duplicate".
 

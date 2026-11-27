@@ -1,0 +1,20 @@
+{
+  "name": "kevinlgoh",
+  "interface": {
+    "displayName": "KevinLGoh plugins"
+  },
+  "plugins": [
+    {
+      "name": "codebase-cleanup-review",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

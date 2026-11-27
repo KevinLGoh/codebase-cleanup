@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codebase Cleanup Review"
+  short_description: "Find code you can safely remove or simplify"
+  default_prompt: "Use $codebase-cleanup-review to review this repository and report what can be safely removed or simplified."
