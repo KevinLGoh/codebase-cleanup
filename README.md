@@ -2,7 +2,7 @@
 
 # Codebase Cleanup Review
 
-An agent skill for Claude and Codex that reviews a codebase for code that adds no value. It explains why each piece is unnecessary, what removing it would change, and how to clean it up without changing how the software behaves.
+An agent skill that reviews a codebase for code that adds no value. It explains why each piece is unnecessary, what removing it would change, and how to clean it up without changing how the software behaves.
 
 It writes a report first and only changes code you approve.
 
