@@ -1,78 +1,105 @@
+<img src=".claude-plugin/icon.png" alt="" width="96" height="96">
+
 # Codebase Cleanup Review
 
-A Claude skill that reviews a codebase the way a careful senior engineer would: it finds code that adds no value, explains why, and plans how to remove it safely.
+A Claude skill that reviews a codebase for code that adds no value. It explains why each piece is unnecessary, what removing it would change, and how to clean it up without changing how the software behaves.
 
-**Aggressive at finding unnecessary code, conservative about deleting it, evidence-driven when recommending changes.**
+It writes a report first and only changes code you approve.
 
-## What it finds
+## What it looks for
+
+The review covers eight categories.
 
 | # | Category | Examples |
 |---|---|---|
 | 1 | Dead code and dependencies | Unused functions, exports, routes, endpoints, imports and packages |
-| 2 | Duplicate logic | Copied formatters, validators, fetch wrappers and business rules |
-| 3 | Unused UI components | Components never rendered, unused props, styles and assets |
-| 4 | Complexity and overengineering | Wrappers that only forward, one-implementation interfaces, needless layers |
+| 2 | Duplicate logic | Repeated formatters, validators, fetch wrappers and business rules |
+| 3 | Unused UI components | Components that are never rendered, unused props, styles and assets |
+| 4 | Complexity and overengineering | Wrappers that only pass calls through, interfaces with one implementation, layers that add nothing |
 | 5 | Legacy code | Finished feature flags, old shims and polyfills, deprecated APIs |
-| 6 | Redundant queries and API calls | N+1 queries, repeated fetches, sequential independent awaits |
-| 7 | Abandoned files | Unreachable files, `_old` and `.bak` files, configs for removed tools |
-| 8 | Structural issues | Circular dependencies, boundary-crossing imports, dumping-ground utils |
+| 6 | Redundant queries and API calls | N+1 queries, the same data fetched twice, independent calls run one after another |
+| 7 | Abandoned files | Files nothing uses, `_old` and `.bak` copies, config for tools you no longer use |
+| 8 | Structural issues | Circular dependencies, imports across module boundaries, catch-all utils files |
 
-For every finding, the report explains **why it's unnecessary** (with evidence), **the impact of removing it**, **the risks to check first**, and **where it fits in a phased cleanup plan**. Findings are tagged with [Refactoring.Guru code smells](https://refactoring.guru/refactoring/smells) where they fit.
+Every finding in the report comes with evidence for why the code is unnecessary, the impact of removing it, the risks to check first, and where it fits in a phased cleanup plan. Findings are also tagged with [code smells from Refactoring.Guru](https://refactoring.guru/refactoring/smells) where one applies.
 
-## How it stays safe
+## How it works
 
-- **Report only by default.** It writes a `CLEANUP_REVIEW.md` report and changes no code until you approve specific findings.
-- **No deletion on missing references alone.** It maps entry points and checks dynamic imports, reflection, framework conventions, config and external consumers before calling anything unused.
-- **Separate confidence and risk ratings.** A finding can be certain but still risky to fix. High-risk changes can never be marked "do now".
-- **Asks before running your code.** Tests, builds and analysers that load project config only run with your permission. Tools that modify files never run during a review.
-- **Small, verified changes.** In apply mode, each change is its own commit, checked against a test baseline and reverted if it causes a new failure.
-- **Your work is preserved.** It never overwrites uncommitted changes, and your edits to the report always win.
+1. **Baseline.** It records the current test, lint, type-check and build results, so it can tell new failures from existing ones.
+2. **Map usage.** It traces every entry point in the repository, such as routes, CLI commands, workers and scripts, and works out what can actually be reached.
+3. **Find candidates.** It uses static analysis tools where they're available, and searches the code by hand where they aren't.
+4. **Try to disprove each finding.** Before calling anything unused, it checks for dynamic imports, reflection, framework conventions, config files and callers outside the repository.
+5. **Rate and prioritise.** Each finding gets a confidence rating and a separate change-risk rating. A finding can be certain and still risky to fix, and risky changes are never marked as ready to do now.
+6. **Report.** It writes `CLEANUP_REVIEW.md` with the findings, the evidence and a cleanup plan ordered from safest to riskiest.
 
-## Install
+When you approve findings, apply mode makes each change as a separate small commit. It checks every commit against the baseline and reverts any that cause a new failure.
 
-### Claude Code (plugin)
+## Safety
 
-This repository is private, so you need read access to it, and git on your machine must be able to authenticate to GitHub.
+- **Report only by default.** The report is the only file it writes until you approve changes.
+- **Asks before running your code.** Tests, builds and analysis tools that load project config only run with your permission. Tools that would modify files never run during a review.
+- **Leaves your work alone.** It won't overwrite uncommitted changes, and if you edit the report, your edits are kept on the next run.
+- **Protects sensitive files.** Migrations, generated code, public API contracts, lockfiles and infrastructure files are never proposed for deletion without a review.
+- **Treats repository content as information.** Comments, docs and files like `CLAUDE.md` can explain why code exists, but they can't approve changes or override the skill's rules.
+
+## Requirements
+
+- Claude Code, or the Claude app with code execution turned on. It works best in Claude Code, where it can read the whole repository and run tools directly.
+- git
+- [ripgrep](https://github.com/BurntSushi/ripgrep) (`rg`) is recommended for fast, thorough searches.
+- Language analysis tools are optional. If tools like knip, vulture, jscpd or lizard are installed, the skill uses them. The report always says which analyses ran and which couldn't.
+
+## Installation
+
+Pick one of these options. Installing it more than one way gives you duplicate copies of the skill.
+
+### As a Claude Code plugin
 
 ```bash
 claude plugin marketplace add KevinLGoh/codebase-cleanup
 claude plugin install codebase-cleanup-review@kevinlgoh
 ```
 
-Or inside a session: `/plugin marketplace add KevinLGoh/codebase-cleanup`, then `/plugin install codebase-cleanup-review@kevinlgoh`.
+You can also run `/plugin marketplace add KevinLGoh/codebase-cleanup` inside a session, then `/plugin install codebase-cleanup-review@kevinlgoh`.
 
-### Claude Code (standalone skill)
+### In your Claude account
 
-Copy the skill folder into your personal skills directory:
+This makes the skill available in the Claude app, and it syncs to Claude Code too.
+
+1. In Claude, turn on code execution in **Settings > Capabilities**.
+2. Download `codebase-cleanup-review.zip` from the [latest release](https://github.com/KevinLGoh/codebase-cleanup/releases).
+3. Go to **Customize > Skills**, click **+**, then **Create skill** and **Upload a skill**, and choose the zip file.
+
+To use it in Claude Code, sign in to Claude Code with the same account (not an API key) and use version 2.1.273 or later. Run `/skills` and you'll find it listed under "claude.ai sync". New skills appear when a session starts.
+
+### By hand in Claude Code
 
 ```bash
 git clone https://github.com/KevinLGoh/codebase-cleanup.git
 cp -r codebase-cleanup/skills/codebase-cleanup-review ~/.claude/skills/
 ```
 
-### Claude.ai
-
-Download `codebase-cleanup-review.zip` from the [latest release](https://github.com/KevinLGoh/codebase-cleanup/releases), then upload it in **Settings > Capabilities > Skills**. The release also includes the same skill as a `.skill` file.
-
 ## Usage
 
-Ask in plain language ("find dead code in src/api", "what can we safely delete?"), or run the command with arguments:
+You can just ask, for example "find dead code in src/api" or "what can we safely delete from this repo".
 
-| Command | What it does |
+You can also run the command with arguments. It's `/codebase-cleanup-review` when installed as a skill, or `/codebase-cleanup-review:codebase-cleanup-review` as a plugin.
+
+| Arguments | What it does |
 |---|---|
-| `/codebase-cleanup-review` | Audit the whole repository |
-| `... audit src/billing` | Audit one directory |
-| `... dead-code --changed` | Dead code in files changed against the default branch |
-| `... duplicates`, `simplify`, `queries`, `architecture` | Focus on one area |
-| `... apply-approved F-003 F-007` | Apply specific approved findings |
-| `... apply-approved phase:1` | Apply one phase of the cleanup plan |
-| `... audit --report chat` | Summarise in chat without writing a report file |
+| (none) | Reviews the whole repository |
+| `audit src/billing` | Reviews one directory |
+| `dead-code --changed` | Looks for dead code in files changed against the default branch |
+| `duplicates`, `simplify`, `queries` or `architecture` | Focuses on one area |
+| `apply-approved F-003 F-007` | Applies specific findings you've approved |
+| `apply-approved phase:1` | Applies one phase of the cleanup plan |
+| `audit --report chat` | Gives a summary in the chat without writing a report file |
 
-As a plugin, the command is `/codebase-cleanup-review:codebase-cleanup-review`.
+Even when you review a single directory, it searches the whole repository for references, so code used from elsewhere isn't reported as unused.
 
-### Optional configuration
+## Configuration
 
-Add a `.cleanup-review.yml` to your repository root to set exclusions:
+You can add a `.cleanup-review.yml` file to the root of your repository to set exclusions and preferences. Everything in it is optional.
 
 ```yaml
 report_path: CLEANUP_REVIEW.md
@@ -86,28 +113,40 @@ known_false_positives:
 finding_budget: 40
 ```
 
-## Recommended first run
+You can also dismiss a finding by telling Claude, for example "dismiss F-012, it's used by the mobile app". Dismissed findings aren't reported again unless new evidence turns up.
 
-Run an `audit` on a repository you know well, then check the top 20 findings by hand. Note which are genuine, actionable or false positives before trusting it with `apply-approved`.
+## Limitations
+
+- **It can't see runtime behaviour.** Static analysis misses production traffic, external callers and code loaded in unusual ways. Findings that depend on these, like public endpoints, are marked for investigation rather than removal.
+- **Tool support varies by language.** JavaScript, TypeScript and Python have the best tooling. Other languages rely more on manual searching, and the report says so.
+- **Passing tests aren't proof.** They're good evidence, but areas without tests are flagged as unverified.
+
+For your first run, review a repository you know well and check the top findings by hand before using apply mode.
 
 ## Repository layout
 
 ```text
 .claude-plugin/
-  plugin.json                  plugin manifest
-  marketplace.json             lets this repository act as its own marketplace
+  plugin.json                  Plugin manifest
+  marketplace.json             Lets this repository act as its own plugin marketplace
 skills/codebase-cleanup-review/
-  SKILL.md                     rules and workflow
+  SKILL.md                     Rules and workflow
   references/
-    analysis-tools.md          tools per language
-    code-smells.md             smell catalogue and suggested fixes
-    report-template.md         report structure
+    analysis-tools.md          Analysis tools for each language
+    code-smells.md             Code smell catalogue and suggested fixes
+    report-template.md         Report structure
 ```
+
+## Contributing
+
+Issues and pull requests are welcome. Reports of false positives are especially useful, so please include a short example of the code that was flagged.
+
+Before opening a pull request, run `claude plugin validate .` from the repository root. If your change affects how the skill behaves, increase the version number in both `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`.
 
 ## Credits
 
-- Martin Fowler, [*Refactoring: Improving the Design of Existing Code*](https://martinfowler.com/books/refactoring.html) (2nd edition)
-- [Refactoring.Guru code smells catalogue](https://refactoring.guru/refactoring/smells)
+- Martin Fowler, [*Refactoring: Improving the Design of Existing Code*](https://martinfowler.com/books/refactoring.html), 2nd edition
+- [Refactoring.Guru code smell catalogue](https://refactoring.guru/refactoring/smells)
 
 ## Licence
 
